@@ -127,7 +127,7 @@
 
 ## 🗄️ 7. ERD
 
-[![ERD](./docs/erd.png)](https://dbdiagram.io/d/699aacf5bd82f5fce2693421)
+[![ERD](https://github.com/user-attachments/assets/a82ebcd0-ae75-4f45-a778-f193dd0616ba)](https://dbdiagram.io/d/699aacf5bd82f5fce2693421)
 
 > 이미지 클릭 시 dbdiagram.io에서 전체 화면으로 확인 가능합니다.
 
