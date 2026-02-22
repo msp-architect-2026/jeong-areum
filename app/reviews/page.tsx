@@ -1,14 +1,22 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { PenSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ReviewCard } from "@/components/review-card"
 import { useAuth } from "@/components/auth-context"
-import { reviews } from "@/lib/mock-data"
 
 export default function ReviewsPage() {
   const { isLoggedIn } = useAuth()
+  const [reviews, setReviews] = useState([])
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews`)
+      .then((res) => res.json())
+      .then((data) => setReviews(data))
+      .catch((err) => console.error("후기 목록 오류:", err))
+  }, [])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
@@ -35,9 +43,15 @@ export default function ReviewsPage() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {reviews.map((review) => (
-          <ReviewCard key={review.id} review={review} />
-        ))}
+        {reviews.length === 0 ? (
+          <p className="text-muted-foreground col-span-3 text-center py-20">
+            아직 등록된 후기가 없습니다.
+          </p>
+        ) : (
+          reviews.map((review: any) => (
+            <ReviewCard key={review.id} review={review} />
+          ))
+        )}
       </div>
     </div>
   )

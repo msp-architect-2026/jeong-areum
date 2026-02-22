@@ -15,22 +15,23 @@ export default function LoginPage() {
   const { login } = useAuth()
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    if (!email || !password) {
-      setError("이메일과 비밀번호를 입력해주세요.")
-      return
-    }
-
-    const success = login(email, password)
-    if (success) {
-      router.push("/")
-    } else {
-      setError("로그인에 실패했습니다.")
-    }
+  if (!email || !password) {
+    setError("이메일과 비밀번호를 입력해주세요.");
+    return;
   }
+
+  const success = await login(email, password);
+
+  if (success) {
+    router.push("/");
+  } else {
+    setError("로그인에 실패했습니다.");
+  }
+};
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-10">

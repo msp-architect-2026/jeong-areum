@@ -113,7 +113,20 @@ export default function HomePage() {
         </div>
         <div className="grid gap-5 md:grid-cols-3">
           {featuredReviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard
+              key={review.id}
+              review={{
+                id: Number(review.id.replace("review-", "")),
+                title: review.title,
+                content: review.content,
+                imageUrl: review.image,
+                authorName: review.author,
+                location: review.location,
+                category: review.category,
+                likes: review.likes,
+                saves: review.saves,
+              }}
+            />
           ))}
         </div>
         <div className="mt-6 text-center md:hidden">
