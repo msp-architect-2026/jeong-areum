@@ -19,10 +19,75 @@
 
 ## 🖼️ 2. 서비스 화면 (Service Preview)
 
-| 🏠 메인 페이지 | ⏰ 타임세일 이벤트 | 📝 여행 후기 커뮤니티 |
-|:-:|:-:|:-:|
-| 특별한 여행 상품 제공 | 선착순 한정 특가 딜 | 사용자 생생 후기 공유 |
+**🔹 주요 화면**
 
+<table>
+  <tr>
+    <td align="center"><b>🏠 메인 페이지</b></td>
+  </tr>
+  <tr>
+    <td><img src="메인페이지.png" width="800"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>⏰ 타임세일 이벤트</b></td>
+  </tr>
+  <tr>
+    <td><img src="타임세일이벤트페이지.png" width="800"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>📝 여행 후기 커뮤니티</b></td>
+  </tr>
+  <tr>
+    <td><img src="여행후기커뮤니티페이지.png" width="800"/></td>
+  </tr>
+</table>
+
+<br>
+
+**🔹 전체 화면 구성 (UI Preview)**
+
+<table>
+  <tr>
+    <td align="center"><b>🔐 회원가입</b></td>
+    <td align="center"><b>📋 메인</b></td>
+    <td align="center"><b>⏰ 이벤트목록</b></td>
+  </tr>
+  <tr>
+    <td><img src="회원가입.png" width="260"/></td>
+    <td><img src="메인.png" width="260"/></td>
+    <td><img src="이벤트목록.png" width="260"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>🎟️ 이벤트상세</b></td>
+    <td align="center"><b>📝 여행후기목록</b></td>
+    <td align="center"><b>✏️ 후기작성</b></td>
+  </tr>
+  <tr>
+    <td><img src="이벤트상세.png" width="260"/></td>
+    <td><img src="여행후기목록.png" width="260"/></td>
+    <td><img src="후기작성.png" width="260"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>📄 후기상세</b></td>
+    <td align="center"><b>👤 마이페이지</b></td>
+    <td align="center"><b>🏢 회사소개</b></td>
+  </tr>
+  <tr>
+    <td><img src="후기상세.png" width="260"/></td>
+    <td><img src="마이페이지.png" width="260"/></td>
+    <td><img src="회사소개.png" width="260"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>🤝 파트너사</b></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><img src="파트너사.png" width="260"/></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 ---
 
 ## 🛠️ 3. 기술 스택 (Tech Stack)
