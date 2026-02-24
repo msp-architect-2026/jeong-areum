@@ -150,6 +150,7 @@ export default function WriteReviewPage() {
             <option value="호텔">호텔</option>
             <option value="관광">관광</option>
             <option value="음식점">음식점</option>
+            <option value="기타">기타</option>
           </select>
         </div>
 

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Heart, Bookmark, MapPin } from "lucide-react"
+import { useAuth } from "@/components/auth-context"
 
 interface Review {
   id: number
@@ -21,25 +22,31 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {
+  const { isLoggedIn, user } = useAuth()
   const [likes, setLikes] = useState(review.likes ?? 0)
   const [liked, setLiked] = useState(false)
 
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (liked) return
+    e.stopPropagation()
+
+    if (!isLoggedIn) return
 
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${review.id}/like`,
         {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
+          // 🔥 email 전송 (백엔드 toggleLike에서 필요)
+          body: JSON.stringify({ email: user?.email }),
         }
       )
 
       if (res.ok) {
         const data = await res.json()
         setLikes(data.likes)
-        setLiked(true)
+        setLiked(data.liked) // 🔥 백엔드에서 liked 여부 반환
       }
     } catch (error) {
       console.error("좋아요 에러:", error)
@@ -54,11 +61,12 @@ export function ReviewCard({ review }: ReviewCardProps) {
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {review.imageUrl ? (
           <img
-            src={review.imageUrl.startsWith("http")
-              ? review.imageUrl
-              : review.imageUrl.startsWith("/uploads")
-              ? `${process.env.NEXT_PUBLIC_API_URL}${review.imageUrl}`
-              : review.imageUrl
+            src={
+              review.imageUrl.startsWith("http")
+                ? review.imageUrl
+                : review.imageUrl.startsWith("/uploads")
+                ? `${process.env.NEXT_PUBLIC_API_URL}${review.imageUrl}`
+                : review.imageUrl
             }
             alt={review.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -107,9 +115,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
                 liked ? "text-red-500" : "hover:text-red-400"
               }`}
             >
-              <Heart
-                className={`h-3.5 w-3.5 ${liked ? "fill-current" : ""}`}
-              />
+              <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current" : ""}`} />
               {likes}
             </button>
 

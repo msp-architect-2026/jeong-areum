@@ -1,6 +1,6 @@
 "use client"
 
-import { use } from "react"
+import { use, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, MapPin, Tag, Download, CheckCircle2, LogIn } from "lucide-react"
@@ -16,6 +16,9 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
   const { isLoggedIn, downloadedDeals, downloadDeal } = useAuth()
   const deal = deals.find((d) => d.id === id)
 
+  // 🔥 잔여 수량 상태로 관리
+  const [remainingQty, setRemainingQty] = useState(deal?.remainingQty ?? 0)
+
   if (!deal) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4">
@@ -29,7 +32,8 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
   }
 
   const isDownloaded = downloadedDeals.includes(deal.id)
-  const qtyPercent = Math.round((deal.remainingQty / deal.totalQty) * 100)
+  // 🔥 remainingQty 상태 사용
+  const qtyPercent = Math.round((remainingQty / deal.totalQty) * 100)
 
   const handleDownload = () => {
     if (!isLoggedIn) {
@@ -37,6 +41,8 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
       return
     }
     downloadDeal(deal.id)
+    // 🔥 다운로드 시 잔여 수량 차감
+    setRemainingQty((prev) => Math.max(0, prev - 1))
   }
 
   return (
@@ -117,8 +123,9 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                 <Tag className="h-4 w-4" />
                 잔여 수량
               </span>
+              {/* 🔥 remainingQty 상태 사용 */}
               <span className="font-semibold text-foreground">
-                {deal.remainingQty} / {deal.totalQty}장
+                {remainingQty} / {deal.totalQty}장
               </span>
             </div>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
