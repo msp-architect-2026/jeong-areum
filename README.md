@@ -92,7 +92,13 @@
 
 ## 🛠️ 3. 기술 스택 (Tech Stack)
 
-**Infrastructure & Orchestration**
+---
+
+### 🔹 Infrastructure & Orchestration
+
+<p>
+<img src="https://skillicons.dev/icons?i=linux,kubernetes,docker" />
+</p>
 
 | 영역 | 기술 | 설명 |
 |------|------|------|
@@ -101,14 +107,26 @@
 | Container | Docker | 환경 표준화 및 빠른 재현 |
 | Orchestration | Kubernetes | HPA를 통한 자동 확장 및 장애 복구 |
 
-**Backend & Frontend**
+---
+
+### 🔹 Backend & Frontend
+
+<p>
+<img src="https://skillicons.dev/icons?i=spring,java,mysql,redis,nextjs" />
+</p>
 
 | 영역 | 기술 | 설명 |
 |------|------|------|
 | Backend | Spring Boot | 구조적 안정성 및 API 구성 |
 | Frontend | Next.js | SSR 기반의 사용자 경험 및 퍼포먼스 최적화 |
 
-**CI/CD & Observability**
+---
+
+### 🔹 CI/CD & Observability
+
+<p>
+<img src="https://skillicons.dev/icons?i=gitlab,prometheus,grafana,docker" />
+</p>
 
 | 영역 | 기술 | 설명 |
 |------|------|------|
