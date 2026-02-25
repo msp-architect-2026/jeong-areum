@@ -106,7 +106,7 @@
 | 영역 | 기술 | 설명 |
 |------|------|------|
 | Backend | Spring Boot | 구조적 안정성 및 API 구성 |
-| Frontend | Thymeleaf | 기능 최소화 및 인프라 집중을 위한 SSR 방식 |
+| Frontend | Next.js | SSR 기반의 사용자 경험 및 퍼포먼스 최적화 |
 
 **CI/CD & Observability**
 
