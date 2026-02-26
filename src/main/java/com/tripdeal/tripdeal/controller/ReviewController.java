@@ -133,6 +133,25 @@ public class ReviewController {
         return ResponseEntity.ok(Map.of("likes", review.getLikes(), "liked", !alreadyLiked));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteReview(@PathVariable("id") Long id) {
+        // 1. 해당 후기가 존재하는지 확인
+        Optional<Review> reviewOpt = reviewRepository.findById(id);
+        if (reviewOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "이미 삭제되었거나 존재하지 않는 후기입니다."));
+        }
+
+        try {
+            // 2. 후기 삭제 (ReviewLike 등 연관된 데이터는 JPA 설정에 따라 다를 수 있으나 보통 review만 삭제)
+            reviewRepository.deleteById(id);
+            return ResponseEntity.ok(Map.of("message", "후기가 성공적으로 삭제되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "삭제 중 서버 오류가 발생했습니다."));
+        }
+    }
+
     @GetMapping("/my/reviews")
     public ResponseEntity<List<Review>> getMyReviews(@RequestParam("email") String email) {
         List<Review> myReviews = reviewRepository.findAllByOrderByCreatedAtDesc()
