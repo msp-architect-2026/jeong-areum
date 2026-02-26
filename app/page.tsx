@@ -5,6 +5,7 @@ import { DealCard } from "@/components/deal-card"
 import { ReviewCard } from "@/components/review-card"
 import { HeroSection } from "@/components/hero-section"
 import { deals, reviews, partners } from "@/lib/mock-data"
+import { CouponEventBanner } from "@/components/coupon-event-banner"
 
 const categories = [
   {
@@ -36,14 +37,19 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
+
       {/* Hero */}
       <HeroSection />
 
       {/* Categories */}
       <section className="mx-auto w-full max-w-7xl px-4 py-16">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-foreground md:text-3xl">카테고리별 할인</h2>
-          <p className="mt-2 text-muted-foreground">원하는 카테고리의 할인 상품을 찾아보세요</p>
+          <h2 className="text-2xl font-bold text-foreground md:text-3xl">
+            카테고리별 할인
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            원하는 카테고리의 할인 상품을 찾아보세요
+          </p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {categories.map((cat) => (
@@ -74,8 +80,12 @@ export default function HomePage() {
                 <Sparkles className="h-5 w-5" />
                 <span className="text-sm font-semibold">타임세일</span>
               </div>
-              <h2 className="text-2xl font-bold text-foreground md:text-3xl">오늘의 특가 딜</h2>
-              <p className="mt-1 text-muted-foreground">지금 놓치면 후회할 한정 특가!</p>
+              <h2 className="text-2xl font-bold text-foreground md:text-3xl">
+                오늘의 특가 딜
+              </h2>
+              <p className="mt-1 text-muted-foreground">
+                지금 놓치면 후회할 한정 특가!
+              </p>
             </div>
             <Link href="/events" className="hidden md:block">
               <Button variant="ghost" className="gap-1 text-primary">
@@ -88,22 +98,46 @@ export default function HomePage() {
               <DealCard key={deal.id} deal={deal} />
             ))}
           </div>
-          <div className="mt-6 text-center md:hidden">
-            <Link href="/events">
-              <Button variant="outline" className="gap-1">
-                전체 딜 보기 <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Reviews Preview */}
+      {/* 쿠폰 오픈 이벤트 */}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <div className="mb-2 flex items-center gap-2 text-primary">
+                <Sparkles className="h-5 w-5" />
+                <span className="text-sm font-semibold">타임 오픈 쿠폰</span>
+              </div>
+              <h2 className="text-2xl font-bold md:text-3xl text-foreground">
+                정해진 시간에 딱 열리는 선착순 특가
+              </h2>
+              <p className="mt-1 text-muted-foreground">
+                할인율 높은 쿠폰을 놓치지 마세요
+              </p>
+            </div>
+            <Link href="/coupon-events" className="hidden md:block">
+              <Button variant="ghost" className="gap-1 text-primary">
+                전체보기 <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          {/* isMainPage=true: 컴포넌트 내부 헤더 숨김 / showAll=false: 4개만 표시 */}
+          <CouponEventBanner showAll={false} isMainPage={true} />
+        </div>
+      </section>
+
+      {/* Reviews */}
       <section className="mx-auto w-full max-w-7xl px-4 py-16">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-foreground md:text-3xl">인기 여행 후기</h2>
-            <p className="mt-1 text-muted-foreground">다른 여행자들의 생생한 이야기를 들어보세요</p>
+            <h2 className="text-2xl font-bold text-foreground md:text-3xl">
+              인기 여행 후기
+            </h2>
+            <p className="mt-1 text-muted-foreground">
+              다른 여행자들의 생생한 이야기를 들어보세요
+            </p>
           </div>
           <Link href="/reviews" className="hidden md:block">
             <Button variant="ghost" className="gap-1 text-primary">
@@ -129,21 +163,18 @@ export default function HomePage() {
             />
           ))}
         </div>
-        <div className="mt-6 text-center md:hidden">
-          <Link href="/reviews">
-            <Button variant="outline" className="gap-1">
-              전체 후기 보기 <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
       </section>
 
       {/* Partners */}
       <section className="bg-card py-16">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-10 text-center">
-            <h2 className="text-2xl font-bold text-foreground md:text-3xl">함께하는 파트너</h2>
-            <p className="mt-2 text-muted-foreground">믿을 수 있는 파트너사와 함께합니다</p>
+            <h2 className="text-2xl font-bold text-foreground md:text-3xl">
+              함께하는 파트너
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              믿을 수 있는 파트너사와 함께합니다
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
             {partners.map((partner) => (
@@ -156,10 +187,11 @@ export default function HomePage() {
                     src={partner.logo}
                     alt={partner.name}
                     className="h-full w-full object-cover"
-                    crossOrigin="anonymous"
                   />
                 </div>
-                <span className="text-sm font-medium text-card-foreground">{partner.name}</span>
+                <span className="text-sm font-medium text-card-foreground">
+                  {partner.name}
+                </span>
               </div>
             ))}
           </div>
@@ -172,6 +204,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
     </div>
   )
 }

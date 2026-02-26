@@ -13,6 +13,7 @@ const eventSubLinks = [
   { label: "호텔", href: "/events/hotels" },
   { label: "관광", href: "/events/tourism" },
   { label: "음식점", href: "/events/restaurants" },
+  { label: "타임오픈쿠폰", href: "/coupon-events" },
 ]
 
 const mainLinks = [
@@ -51,21 +52,25 @@ export function Header() {
             <button
               className={cn(
                 "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted",
-                pathname.startsWith("/events") ? "text-primary" : "text-foreground"
+                pathname.startsWith("/events") || pathname.startsWith("/coupon-events")
+                  ? "text-primary"
+                  : "text-foreground"
               )}
             >
               이벤트
               <ChevronDown className={cn("h-4 w-4 transition-transform", eventOpen && "rotate-180")} />
             </button>
             {eventOpen && (
-              <div className="absolute left-0 top-full w-36 rounded-lg border border-border bg-card py-1 shadow-lg">
+              <div className="absolute left-0 top-full w-40 rounded-lg border border-border bg-card py-1 shadow-lg">
                 {eventSubLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={cn(
                       "block px-4 py-2 text-sm transition-colors hover:bg-muted",
-                      pathname === link.href ? "text-primary font-medium" : "text-foreground"
+                      pathname === link.href ? "text-primary font-medium" : "text-foreground",
+                      // 타임오픈쿠폰은 구분선 위에 강조
+                      link.href === "/coupon-events" && "border-t border-border mt-1 pt-2 text-primary font-medium"
                     )}
                   >
                     {link.label}
@@ -140,7 +145,8 @@ export function Header() {
                 onClick={() => setMobileOpen(false)}
                 className={cn(
                   "block rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted",
-                  pathname === link.href ? "text-primary font-medium" : "text-foreground"
+                  pathname === link.href ? "text-primary font-medium" : "text-foreground",
+                  link.href === "/coupon-events" && "text-primary font-medium"
                 )}
               >
                 {link.label}

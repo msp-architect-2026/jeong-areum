@@ -31,6 +31,10 @@ interface AuthContextType {
   downloadedDeals: string[]
   downloadDeal: (dealId: string) => void
 
+  // ✅ 쿠폰 이벤트
+  downloadedCoupons: number[]
+  downloadCoupon: (couponEventId: number) => void
+
   likedReviews: string[]
   toggleLike: (reviewId: string) => void
 
@@ -45,6 +49,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 const STORAGE_KEY = "tripdeal_user"
 const DEALS_KEY = "tripdeal_downloaded_deals"
+const COUPONS_KEY = "tripdeal_downloaded_coupons"
 
 const saveUserToStorage = (user: User | null) => {
   if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
@@ -62,24 +67,25 @@ const loadUserFromStorage = (): User | null => {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-
-  const [downloadedDeals, setDownloadedDeals] = useState<string[]>(() => {
-    if (typeof window === "undefined") return []
-    try {
-      const saved = localStorage.getItem(DEALS_KEY)
-      return saved ? JSON.parse(saved) : []
-    } catch {
-      return []
-    }
-  })
-
+  // ✅ 초기값 [] 고정 → useEffect에서 localStorage 로드 (hydration 안전)
+  const [downloadedDeals, setDownloadedDeals] = useState<string[]>([])
+  const [downloadedCoupons, setDownloadedCoupons] = useState<number[]>([])
   const [likedReviews, setLikedReviews] = useState<string[]>([])
   const [savedReviews, setSavedReviews] = useState<string[]>([])
   const [myReviews, setMyReviews] = useState<string[]>([])
 
+  // ✅ 클라이언트 마운트 후에만 localStorage 읽기
   useEffect(() => {
-    const saved = loadUserFromStorage()
-    if (saved) setUser(saved)
+    const savedUser = loadUserFromStorage()
+    if (savedUser) setUser(savedUser)
+
+    try {
+      const savedDeals = localStorage.getItem(DEALS_KEY)
+      if (savedDeals) setDownloadedDeals(JSON.parse(savedDeals))
+
+      const savedCoupons = localStorage.getItem(COUPONS_KEY)
+      if (savedCoupons) setDownloadedCoupons(JSON.parse(savedCoupons))
+    } catch {}
   }, [])
 
   useEffect(() => {
@@ -87,9 +93,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user])
 
   useEffect(() => {
-    if (typeof window === "undefined") return
     localStorage.setItem(DEALS_KEY, JSON.stringify(downloadedDeals))
   }, [downloadedDeals])
+
+  useEffect(() => {
+    localStorage.setItem(COUPONS_KEY, JSON.stringify(downloadedCoupons))
+  }, [downloadedCoupons])
 
   const login = useCallback(async (email: string, password: string) => {
     try {
@@ -98,20 +107,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       })
-
       if (!response.ok) return false
-
       const data = await response.json()
-
-      const newUser: User = {
+      setUser({
         id: String(data.id ?? "user-" + Date.now()),
         name: data.name ?? email.split("@")[0],
         nickname: data.nickname ?? data.name ?? email.split("@")[0],
         email: data.email ?? email,
         profileImageUrl: data.profileImageUrl || undefined,
-      }
-
-      setUser(newUser)
+      })
       return true
     } catch (error) {
       console.error("로그인 에러:", error)
@@ -119,7 +123,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // 🔥 백엔드에 실제 회원가입 요청
   const signup = useCallback(async (
     name: string,
     nickname: string,
@@ -133,13 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, nickname, email, password, profileImageUrl }),
       })
-
-      if (!response.ok) {
-        const data = await response.json()
-        console.error("회원가입 실패:", data.message)
-        return false
-      }
-
+      if (!response.ok) return false
       return true
     } catch (error) {
       console.error("회원가입 에러:", error)
@@ -147,7 +144,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // 🔥 백엔드에 실제 프로필 이미지 업데이트 요청
   const updateProfileImage = useCallback(async (imageUrl: string): Promise<boolean> => {
     if (!user) return false
     try {
@@ -160,7 +156,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       )
       if (!response.ok) return false
-
       setUser((prev) => {
         const updated = prev ? { ...prev, profileImageUrl: imageUrl } : prev
         if (updated) saveUserToStorage(updated)
@@ -173,13 +168,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user])
 
-  // 🔥 백엔드에 실제 닉네임 업데이트 요청
   const updateNickname = useCallback(async (nickname: string): Promise<{ ok: boolean; message?: string }> => {
     if (!user) return { ok: false, message: "로그인이 필요합니다." }
-
     const trimmed = nickname.trim()
     if (!trimmed) return { ok: false, message: "닉네임을 입력해주세요." }
-
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/${encodeURIComponent(user.email)}/nickname`,
@@ -189,10 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ nickname: trimmed }),
         }
       )
-
       const data = await response.json().catch(() => ({}))
       if (!response.ok) return { ok: false, message: data.message || "닉네임 변경에 실패했습니다." }
-
       setUser((prev) => {
         const updated = prev ? { ...prev, nickname: trimmed } : prev
         if (updated) saveUserToStorage(updated)
@@ -208,31 +198,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setUser(null)
     setDownloadedDeals([])
+    setDownloadedCoupons([])
     setLikedReviews([])
     setSavedReviews([])
     setMyReviews([])
     localStorage.removeItem(DEALS_KEY)
+    localStorage.removeItem(COUPONS_KEY)
   }, [])
 
   const downloadDeal = useCallback((dealId: string) => {
-    setDownloadedDeals((prev) =>
-      prev.includes(dealId) ? prev : [...prev, dealId]
-    )
+    setDownloadedDeals((prev) => prev.includes(dealId) ? prev : [...prev, dealId])
+  }, [])
+
+  const downloadCoupon = useCallback((couponEventId: number) => {
+    setDownloadedCoupons((prev) => prev.includes(couponEventId) ? prev : [...prev, couponEventId])
   }, [])
 
   const toggleLike = useCallback((reviewId: string) => {
     setLikedReviews((prev) =>
-      prev.includes(reviewId)
-        ? prev.filter((id) => id !== reviewId)
-        : [...prev, reviewId]
+      prev.includes(reviewId) ? prev.filter((id) => id !== reviewId) : [...prev, reviewId]
     )
   }, [])
 
   const toggleSave = useCallback((reviewId: string) => {
     setSavedReviews((prev) =>
-      prev.includes(reviewId)
-        ? prev.filter((id) => id !== reviewId)
-        : [...prev, reviewId]
+      prev.includes(reviewId) ? prev.filter((id) => id !== reviewId) : [...prev, reviewId]
     )
   }, [])
 
@@ -252,6 +242,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updateNickname,
         downloadedDeals,
         downloadDeal,
+        downloadedCoupons,
+        downloadCoupon,
         likedReviews,
         toggleLike,
         savedReviews,
@@ -267,8 +259,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider")
   return context
 }

@@ -1,32 +1,39 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Download, Heart, Bookmark, PenSquare, Camera, LogIn } from "lucide-react"
+import { Download, Heart, Bookmark, PenSquare, Camera, LogIn, Ticket } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/components/auth-context"
 import { deals, formatPrice, getCategoryLabel } from "@/lib/mock-data"
+import { COUPON_EVENTS } from "@/components/coupon-event-banner"
 import { cn } from "@/lib/utils"
 
 const tabs = [
   { key: "coupons", label: "다운로드한 할인권", icon: Download },
+  { key: "couponEvents", label: "받은 쿠폰", icon: Ticket },
   { key: "saved", label: "저장한 후기", icon: Bookmark },
   { key: "liked", label: "좋아요한 후기", icon: Heart },
   { key: "myreviews", label: "내 후기", icon: PenSquare },
 ]
 
-export default function MyPage() {
+// ✅ useSearchParams는 Suspense 안에서만 써야 해서 내부 컴포넌트로 분리
+function MyPageContent() {
+  const searchParams = useSearchParams()
   const {
     isLoggedIn,
     user,
     downloadedDeals,
+    downloadedCoupons,
     savedReviews,
     updateProfileImage,
     updateNickname,
   } = useAuth()
 
-  const [activeTab, setActiveTab] = useState("coupons")
+  // ✅ URL의 tab 파라미터로 초기 탭 설정
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "coupons")
   const [uploading, setUploading] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
   const [editing, setEditing] = useState(false)
@@ -37,7 +44,6 @@ export default function MyPage() {
   const [myReviewList, setMyReviewList] = useState<any[]>([])
   const [savedReviewList, setSavedReviewList] = useState<any[]>([])
 
-  // 쿠폰 날짜 저장
   useEffect(() => {
     if (typeof window === "undefined" || !downloadedDeals) return
     downloadedDeals.forEach((dealId) => {
@@ -48,7 +54,6 @@ export default function MyPage() {
     })
   }, [downloadedDeals])
 
-  // 좋아요/내 후기 페칭
   useEffect(() => {
     if (!isLoggedIn || !user?.email) return
     if (activeTab === "liked") {
@@ -65,7 +70,6 @@ export default function MyPage() {
     }
   }, [isLoggedIn, user?.email, activeTab])
 
-  // 저장한 후기 페칭
   useEffect(() => {
     if (!isLoggedIn || savedReviews.length === 0 || activeTab !== "saved") {
       setSavedReviewList([])
@@ -84,6 +88,10 @@ export default function MyPage() {
     downloadedDeals.map((id) => String(id)).includes(String(deal.id))
   )
 
+  const myDownloadedCoupons = COUPON_EVENTS.filter((event) =>
+    downloadedCoupons.includes(event.id)
+  )
+
   const calcRemainingDays = (dealId: any) => {
     if (typeof window === "undefined") return 30
     const saved = localStorage.getItem(`coupon_date_${dealId}`)
@@ -93,7 +101,6 @@ export default function MyPage() {
     return Math.ceil((expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
   }
 
-  // 닉네임 수정
   const handleNicknameUpdate = async () => {
     setNicknameError("")
     const result = await updateNickname(newNickname)
@@ -106,7 +113,6 @@ export default function MyPage() {
     }
   }
 
-  // 프로필 이미지 업로드
   const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -129,7 +135,6 @@ export default function MyPage() {
     }
   }
 
-  // 프로필 이미지 삭제
   const handleProfileImageDelete = async () => {
     setUploading(true)
     setSuccessMsg("")
@@ -154,7 +159,6 @@ export default function MyPage() {
     <div className="mx-auto max-w-4xl px-4 py-10">
       {/* Profile Section */}
       <div className="mb-8 flex items-center gap-4 rounded-2xl border bg-card p-6">
-        {/* 🔥 프로필 이미지 - 클릭으로 변경 가능 */}
         <div className="relative shrink-0">
           <label className="cursor-pointer group relative block">
             <div className="h-16 w-16 rounded-full border-2 border-border bg-primary/10 flex items-center justify-center overflow-hidden">
@@ -173,7 +177,6 @@ export default function MyPage() {
             </div>
             <input type="file" accept="image/*" className="hidden" onChange={handleProfileImageChange} />
           </label>
-          {/* 🔥 삭제 버튼 */}
           {currentImage && (
             <button
               onClick={handleProfileImageDelete}
@@ -184,7 +187,6 @@ export default function MyPage() {
           )}
         </div>
 
-        {/* 🔥 닉네임 + 이메일 */}
         <div className="flex-1">
           <div className="flex items-center gap-2">
             {editing ? (
@@ -273,6 +275,41 @@ export default function MyPage() {
         </div>
       )}
 
+      {activeTab === "couponEvents" && (
+        <div className="space-y-3">
+          {myDownloadedCoupons.length === 0 ? (
+            <EmptyState message="받은 쿠폰이 없습니다." linkLabel="쿠폰 보러가기" linkHref="/coupon-events" />
+          ) : (
+            myDownloadedCoupons.map((event) => {
+              const expireDate = new Date(event.expireAt)
+              const remainingDays = Math.ceil((expireDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+              return (
+                <Link
+                  key={event.id}
+                  href={`/coupon-events/${event.id}`}
+                  className="flex items-center gap-4 rounded-xl border bg-card p-4 hover:bg-muted/50 transition-colors"
+                >
+                  <img src={event.imageUrl} alt={event.title} className="h-16 w-24 shrink-0 rounded-lg object-cover" />
+                  <div className="flex-1">
+                    <Badge variant="secondary" className="text-xs">타임오픈쿠폰</Badge>
+                    <p className="font-medium mt-1">{event.title}</p>
+                    <p className="text-sm text-primary font-semibold">{event.discountRate}% 할인</p>
+                    {remainingDays > 0 ? (
+                      <p className="text-xs font-medium mt-1 text-orange-600">⏳ D-{remainingDays}</p>
+                    ) : (
+                      <p className="text-xs font-medium mt-1 text-destructive">❌ 만료됨</p>
+                    )}
+                  </div>
+                  <Badge className={remainingDays > 0 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}>
+                    {remainingDays > 0 ? "사용가능" : "만료"}
+                  </Badge>
+                </Link>
+              )
+            })
+          )}
+        </div>
+      )}
+
       {activeTab === "saved" && (
         <div className="space-y-3">
           {savedReviewList.length === 0
@@ -297,6 +334,15 @@ export default function MyPage() {
         </div>
       )}
     </div>
+  )
+}
+
+// ✅ useSearchParams 때문에 Suspense로 감싸야 함
+export default function MyPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>}>
+      <MyPageContent />
+    </Suspense>
   )
 }
 
