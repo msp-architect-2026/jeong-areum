@@ -43,7 +43,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// 🔥 저장 키들
 const STORAGE_KEY = "tripdeal_user"
 const DEALS_KEY = "tripdeal_downloaded_deals"
 
@@ -64,18 +63,20 @@ const loadUserFromStorage = (): User | null => {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
 
-  // 🔥 downloadedDeals를 localStorage에서 복원
   const [downloadedDeals, setDownloadedDeals] = useState<string[]>(() => {
     if (typeof window === "undefined") return []
-    const saved = localStorage.getItem(DEALS_KEY)
-    return saved ? JSON.parse(saved) : []
+    try {
+      const saved = localStorage.getItem(DEALS_KEY)
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
   })
 
   const [likedReviews, setLikedReviews] = useState<string[]>([])
   const [savedReviews, setSavedReviews] = useState<string[]>([])
   const [myReviews, setMyReviews] = useState<string[]>([])
 
-  // 유저 복원
   useEffect(() => {
     const saved = loadUserFromStorage()
     if (saved) setUser(saved)
@@ -85,7 +86,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     saveUserToStorage(user)
   }, [user])
 
-  // 🔥 downloadedDeals 변경될 때 localStorage에 저장
   useEffect(() => {
     if (typeof window === "undefined") return
     localStorage.setItem(DEALS_KEY, JSON.stringify(downloadedDeals))
@@ -119,18 +119,90 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const signup = useCallback(async () => true, [])
+  // 🔥 백엔드에 실제 회원가입 요청
+  const signup = useCallback(async (
+    name: string,
+    nickname: string,
+    email: string,
+    password: string,
+    profileImageUrl?: string
+  ): Promise<boolean> => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, nickname, email, password, profileImageUrl }),
+      })
 
-  const updateProfileImage = useCallback(async (imageUrl: string) => {
+      if (!response.ok) {
+        const data = await response.json()
+        console.error("회원가입 실패:", data.message)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error("회원가입 에러:", error)
+      return false
+    }
+  }, [])
+
+  // 🔥 백엔드에 실제 프로필 이미지 업데이트 요청
+  const updateProfileImage = useCallback(async (imageUrl: string): Promise<boolean> => {
     if (!user) return false
-    setUser((prev) => prev ? { ...prev, profileImageUrl: imageUrl } : prev)
-    return true
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${encodeURIComponent(user.email)}/profile-image`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ profileImageUrl: imageUrl }),
+        }
+      )
+      if (!response.ok) return false
+
+      setUser((prev) => {
+        const updated = prev ? { ...prev, profileImageUrl: imageUrl } : prev
+        if (updated) saveUserToStorage(updated)
+        return updated
+      })
+      return true
+    } catch (error) {
+      console.error("프로필 이미지 업데이트 에러:", error)
+      return false
+    }
   }, [user])
 
-  const updateNickname = useCallback(async (nickname: string) => {
-    if (!user) return { ok: false }
-    setUser((prev) => prev ? { ...prev, nickname } : prev)
-    return { ok: true }
+  // 🔥 백엔드에 실제 닉네임 업데이트 요청
+  const updateNickname = useCallback(async (nickname: string): Promise<{ ok: boolean; message?: string }> => {
+    if (!user) return { ok: false, message: "로그인이 필요합니다." }
+
+    const trimmed = nickname.trim()
+    if (!trimmed) return { ok: false, message: "닉네임을 입력해주세요." }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${encodeURIComponent(user.email)}/nickname`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nickname: trimmed }),
+        }
+      )
+
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) return { ok: false, message: data.message || "닉네임 변경에 실패했습니다." }
+
+      setUser((prev) => {
+        const updated = prev ? { ...prev, nickname: trimmed } : prev
+        if (updated) saveUserToStorage(updated)
+        return updated
+      })
+      return { ok: true }
+    } catch (error) {
+      console.error("닉네임 업데이트 에러:", error)
+      return { ok: false, message: "서버 오류가 발생했습니다." }
+    }
   }, [user])
 
   const logout = useCallback(() => {

@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Heart, Bookmark, MapPin, Calendar } from "lucide-react"
+import { ArrowLeft, Heart, Bookmark, MapPin, Calendar, Trash2 } from "lucide-react" // 🔥 Trash2 아이콘 추가
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/components/auth-context"
@@ -47,6 +47,27 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
       .then((data) => setLiked(data.liked ?? false))
       .catch(() => {})
   }, [id, isLoggedIn, user?.email])
+
+  // 🔥 삭제 핸들러 추가
+  const handleDelete = async () => {
+    if (!confirm("정말로 이 후기를 삭제하시겠습니까?")) return
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${id}`, {
+        method: "DELETE",
+      })
+
+      if (res.ok) {
+        alert("후기가 삭제되었습니다.")
+        router.push("/reviews") // 삭제 후 목록으로 이동
+      } else {
+        alert("삭제 권한이 없거나 실패했습니다.")
+      }
+    } catch (error) {
+      console.error("삭제 에러:", error)
+      alert("삭제 중 오류가 발생했습니다.")
+    }
+  }
 
   const handleLike = async () => {
     if (!isLoggedIn) return
@@ -107,17 +128,35 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
   }
 
   const isSaved = savedReviews.includes(String(review.id))
+  
+  // 🔥 본인 확인 로직: 로그인 이메일과 글쓴이 이메일 비교
+  const isAuthor = isLoggedIn && user?.email === review.authorEmail
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      {/* 뒤로가기 */}
-      <button
-        onClick={() => router.back()}
-        className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        뒤로가기
-      </button>
+      {/* 상단 버튼 바 */}
+      <div className="mb-6 flex items-center justify-between">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          뒤로가기
+        </button>
+
+        {/* 🔥 본인일 때만 삭제 버튼 노출 */}
+        {isAuthor && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleDelete}
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
+          >
+            <Trash2 className="h-4 w-4" />
+            삭제하기
+          </Button>
+        )}
+      </div>
 
       {/* 메타 정보 + 제목 */}
       <div className="mb-6">
@@ -218,7 +257,6 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
           ) : (
             comments.map((c: any) => (
               <div key={c.id} className="flex gap-3 rounded-xl border border-border p-4">
-                {/* 🔥 프로필 이미지 or 이니셜 아바타 */}
                 {c.authorProfileImageUrl ? (
                   <img
                     src={
@@ -234,7 +272,7 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ id: str
                     {c.authorName?.charAt(0)}
                   </div>
                 )}
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-medium">{c.authorName}</p>
                   <p className="text-sm text-muted-foreground">{c.content}</p>
                   <p className="text-xs text-muted-foreground mt-1">{c.createdAt?.substring(0, 10)}</p>

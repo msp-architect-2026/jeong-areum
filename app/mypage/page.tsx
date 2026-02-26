@@ -37,7 +37,7 @@ export default function MyPage() {
   const [myReviewList, setMyReviewList] = useState<any[]>([])
   const [savedReviewList, setSavedReviewList] = useState<any[]>([])
 
-  // ✅ 쿠폰 날짜 저장 로직
+  // 쿠폰 날짜 저장
   useEffect(() => {
     if (typeof window === "undefined" || !downloadedDeals) return
     downloadedDeals.forEach((dealId) => {
@@ -48,17 +48,15 @@ export default function MyPage() {
     })
   }, [downloadedDeals])
 
-  // ✅ 데이터 페칭 로직
+  // 좋아요/내 후기 페칭
   useEffect(() => {
     if (!isLoggedIn || !user?.email) return
-    
     if (activeTab === "liked") {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/my/likes?email=${encodeURIComponent(user.email)}`)
         .then((res) => res.json())
         .then((data) => setLikedReviewList(Array.isArray(data) ? data : []))
         .catch((err) => console.error(err))
     }
-
     if (activeTab === "myreviews") {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/my/reviews?email=${encodeURIComponent(user.email)}`)
         .then((res) => res.json())
@@ -82,24 +80,62 @@ export default function MyPage() {
     ).then((results) => setSavedReviewList(results.filter(Boolean)))
   }, [isLoggedIn, savedReviews, activeTab])
 
-  // 쿠폰 필터링
-  const myDownloadedDeals = deals.filter((deal) => 
-    downloadedDeals.map(id => String(id)).includes(String(deal.id))
+  const myDownloadedDeals = deals.filter((deal) =>
+    downloadedDeals.map((id) => String(id)).includes(String(deal.id))
   )
 
   const calcRemainingDays = (dealId: any) => {
     if (typeof window === "undefined") return 30
     const saved = localStorage.getItem(`coupon_date_${dealId}`)
     if (!saved) return 30
-    const downloadDate = new Date(saved)
-    const expiryDate = new Date(downloadDate)
+    const expiryDate = new Date(saved)
     expiryDate.setDate(expiryDate.getDate() + 30)
     return Math.ceil((expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
   }
 
+  // 닉네임 수정
   const handleNicknameUpdate = async () => {
+    setNicknameError("")
     const result = await updateNickname(newNickname)
-    if (result.ok) setEditing(false)
+    if (result.ok) {
+      setEditing(false)
+      setSuccessMsg("닉네임이 변경되었습니다!")
+      setTimeout(() => setSuccessMsg(""), 3000)
+    } else {
+      setNicknameError(result.message || "닉네임 변경에 실패했습니다.")
+    }
+  }
+
+  // 프로필 이미지 업로드
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setSuccessMsg("")
+    const formData = new FormData()
+    formData.append("file", file)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
+        method: "POST",
+        body: formData,
+      })
+      const data = await res.json()
+      const success = await updateProfileImage(data.imageUrl)
+      if (success) setSuccessMsg("프로필 이미지가 업데이트되었습니다!")
+    } catch (err) {
+      console.error("프로필 이미지 업로드 실패:", err)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // 프로필 이미지 삭제
+  const handleProfileImageDelete = async () => {
+    setUploading(true)
+    setSuccessMsg("")
+    const success = await updateProfileImage("")
+    if (success) setSuccessMsg("프로필 이미지가 삭제되었습니다!")
+    setUploading(false)
   }
 
   if (!isLoggedIn) {
@@ -112,37 +148,99 @@ export default function MyPage() {
     )
   }
 
+  const currentImage = user?.profileImageUrl
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       {/* Profile Section */}
       <div className="mb-8 flex items-center gap-4 rounded-2xl border bg-card p-6">
-        <div className="h-16 w-16 rounded-full border bg-primary/10 flex items-center justify-center overflow-hidden">
-          {user?.profileImageUrl ? (
-            <img src={user.profileImageUrl.startsWith("http") ? user.profileImageUrl : `${process.env.NEXT_PUBLIC_API_URL}${user.profileImageUrl}`} className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-2xl font-bold text-primary">{user?.nickname?.charAt(0)}</span>
+        {/* 🔥 프로필 이미지 - 클릭으로 변경 가능 */}
+        <div className="relative shrink-0">
+          <label className="cursor-pointer group relative block">
+            <div className="h-16 w-16 rounded-full border-2 border-border bg-primary/10 flex items-center justify-center overflow-hidden">
+              {currentImage ? (
+                <img
+                  src={currentImage.startsWith("http") ? currentImage : `${process.env.NEXT_PUBLIC_API_URL}${currentImage}`}
+                  alt="프로필"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-2xl font-bold text-primary">{user?.nickname?.charAt(0)}</span>
+              )}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Camera className="h-5 w-5 text-white" />
+            </div>
+            <input type="file" accept="image/*" className="hidden" onChange={handleProfileImageChange} />
+          </label>
+          {/* 🔥 삭제 버튼 */}
+          {currentImage && (
+            <button
+              onClick={handleProfileImageDelete}
+              disabled={uploading}
+              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-white text-xs hover:bg-red-600 transition-colors"
+              title="프로필 이미지 삭제"
+            >×</button>
           )}
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">{user?.nickname}님</h1>
+
+        {/* 🔥 닉네임 + 이메일 */}
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            {editing ? (
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <input
+                    value={newNickname}
+                    onChange={(e) => setNewNickname(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleNicknameUpdate()}
+                    className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-primary"
+                    autoFocus
+                  />
+                  <button onClick={handleNicknameUpdate} className="text-xs text-green-600 underline">저장</button>
+                  <button onClick={() => { setEditing(false); setNicknameError("") }} className="text-xs text-muted-foreground underline">취소</button>
+                </div>
+                {nicknameError && <p className="text-xs text-destructive">{nicknameError}</p>}
+              </div>
+            ) : (
+              <>
+                <h1 className="text-2xl font-bold text-foreground">{user?.nickname}님</h1>
+                <button
+                  onClick={() => { setNewNickname(user?.nickname || ""); setEditing(true) }}
+                  className="text-xs text-primary underline"
+                >수정</button>
+              </>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
+          {uploading && <p className="text-xs text-muted-foreground mt-0.5">처리 중...</p>}
+          {successMsg && <p className="text-xs text-green-600 font-medium mt-0.5">{successMsg}</p>}
+          {!uploading && !successMsg && !editing && (
+            <p className="text-xs text-muted-foreground mt-0.5">프로필 사진을 클릭하여 변경</p>
+          )}
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-2 overflow-x-auto">
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-1">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={cn("flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all", activeTab === tab.key ? "bg-primary text-primary-foreground" : "border")}
+            className={cn(
+              "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+              activeTab === tab.key
+                ? "bg-primary text-primary-foreground"
+                : "bg-card border border-border text-muted-foreground hover:bg-muted"
+            )}
           >
-            <tab.icon className="h-4 w-4" /> {tab.label}
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Content Area */}
+      {/* Content */}
       {activeTab === "coupons" && (
         <div className="space-y-3">
           {myDownloadedDeals.length === 0 ? (
@@ -151,15 +249,23 @@ export default function MyPage() {
             myDownloadedDeals.map((deal) => {
               const remainingDays = calcRemainingDays(deal.id)
               return (
-                <Link key={deal.id} href={`/events/${deal.id}`} className="flex items-center gap-4 rounded-xl border bg-card p-4 hover:bg-muted/50 transition-colors">
-                  <img src={deal.image} className="h-16 w-24 rounded-lg object-cover" crossOrigin="anonymous" />
+                <Link key={deal.id} href={`/events/${deal.id}`}
+                  className="flex items-center gap-4 rounded-xl border bg-card p-4 hover:bg-muted/50 transition-colors"
+                >
+                  <img src={deal.image} alt={deal.title} className="h-16 w-24 shrink-0 rounded-lg object-cover" crossOrigin="anonymous" />
                   <div className="flex-1">
                     <Badge variant="secondary" className="text-xs">{getCategoryLabel(deal.category)}</Badge>
                     <p className="font-medium mt-1">{deal.title}</p>
                     <p className="text-sm text-primary font-semibold">{formatPrice(deal.discountPrice)}</p>
-                    <p className="text-xs font-medium mt-1 text-orange-600">⏳ D-{remainingDays}</p>
+                    {remainingDays > 0 ? (
+                      <p className="text-xs font-medium mt-1 text-orange-600">⏳ D-{remainingDays}</p>
+                    ) : (
+                      <p className="text-xs font-medium mt-1 text-destructive">❌ 만료됨</p>
+                    )}
                   </div>
-                  <Badge>사용가능</Badge>
+                  <Badge className={remainingDays > 0 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}>
+                    {remainingDays > 0 ? "사용가능" : "만료"}
+                  </Badge>
                 </Link>
               )
             })
@@ -169,26 +275,30 @@ export default function MyPage() {
 
       {activeTab === "saved" && (
         <div className="space-y-3">
-          {savedReviewList.length === 0 ? <EmptyState message="저장한 후기가 없습니다." linkLabel="후기 보기" linkHref="/reviews" /> : savedReviewList.map(r => <ReviewItem key={r.id} review={r} />)}
+          {savedReviewList.length === 0
+            ? <EmptyState message="저장한 후기가 없습니다." linkLabel="후기 보기" linkHref="/reviews" />
+            : savedReviewList.map((r) => <ReviewItem key={r.id} review={r} />)}
         </div>
       )}
 
       {activeTab === "liked" && (
         <div className="space-y-3">
-          {likedReviewList.length === 0 ? <EmptyState message="좋아요한 후기가 없습니다." linkLabel="후기 보기" linkHref="/reviews" /> : likedReviewList.map(r => <ReviewItem key={r.id} review={r} />)}
+          {likedReviewList.length === 0
+            ? <EmptyState message="좋아요한 후기가 없습니다." linkLabel="후기 보기" linkHref="/reviews" />
+            : likedReviewList.map((r) => <ReviewItem key={r.id} review={r} />)}
         </div>
       )}
 
       {activeTab === "myreviews" && (
         <div className="space-y-3">
-          {myReviewList.length === 0 ? <EmptyState message="작성한 후기가 없습니다." linkLabel="후기 작성하기" linkHref="/reviews/write" /> : myReviewList.map(r => <ReviewItem key={r.id} review={r} />)}
+          {myReviewList.length === 0
+            ? <EmptyState message="작성한 후기가 없습니다." linkLabel="후기 작성하기" linkHref="/reviews/write" />
+            : myReviewList.map((r) => <ReviewItem key={r.id} review={r} />)}
         </div>
       )}
     </div>
   )
 }
-
-// ─── 아래 컴포넌트들이 누락되어 에러가 났었습니다! ───
 
 function EmptyState({ message, linkLabel, linkHref }: { message: string; linkLabel: string; linkHref: string }) {
   return (
