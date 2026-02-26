@@ -1,9 +1,13 @@
 package com.tripdeal.tripdeal.controller;
 
+//import com.tripdeal.tripdeal.dto.CouponEventResponseDto;
+//import com.tripdeal.tripdeal.dto.CouponResponseDto;
 import com.tripdeal.tripdeal.entity.Coupon;
 import com.tripdeal.tripdeal.entity.User;
+import com.tripdeal.tripdeal.repository.CouponEventRepository;
 import com.tripdeal.tripdeal.repository.CouponRepository;
 import com.tripdeal.tripdeal.repository.UserRepository;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +16,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/coupons")
-@CrossOrigin(origins = "*") // 필요하면 유지
+@CrossOrigin(origins = "*")
 public class CouponController {
 
     private final CouponRepository couponRepository;
     private final UserRepository userRepository;
+    private final CouponEventRepository couponEventRepository;
 
+    // 🔥 생성자 수정 (CouponEventRepository 추가)
     public CouponController(CouponRepository couponRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            CouponEventRepository couponEventRepository) {
+
         this.couponRepository = couponRepository;
         this.userRepository = userRepository;
+        this.couponEventRepository = couponEventRepository;
     }
 
     /**
@@ -68,6 +77,25 @@ public class CouponController {
                 .findByUser(user)
                 .stream()
                 .map(CouponResponseDto::new)
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * ✅ 3. 배너용 - 오픈 예정 쿠폰 이벤트 조회
+     * GET /api/coupons/events/upcoming
+     */
+    @GetMapping("/events/upcoming")
+    public ResponseEntity<List<CouponEventResponseDto>> getUpcomingEvents() {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime until = now.plusHours(48); // 48시간 이내 오픈 예정
+
+        List<CouponEventResponseDto> result = couponEventRepository
+                .findUpcoming(now, until)
+                .stream()
+                .map(CouponEventResponseDto::new)
                 .toList();
 
         return ResponseEntity.ok(result);
