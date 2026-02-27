@@ -26,7 +26,7 @@
     <td align="center"><b>🏠 메인 페이지</b></td>
   </tr>
   <tr>
-    <td><img src="메인페이지.png" width="800"/></td>
+    <td><img src="메인.png" width="800"/></td>
   </tr>
   <tr>
     <td align="center"><b>⏰ 타임세일 이벤트</b></td>
@@ -53,9 +53,9 @@
     <td align="center"><b>⏰ 이벤트목록</b></td>
   </tr>
   <tr>
-    <td><img src="회원가입.png" width="260"/></td>
-    <td><img src="메인.png" width="260"/></td>
-    <td><img src="이벤트목록.png" width="260"/></td>
+    <td><img src="회원가입.png" width="300"/></td>
+    <td><img src="메인페이지.png" width="320"/></td>
+    <td><img src="이벤트목록.png" width="320"/></td>
   </tr>
   <tr>
     <td align="center"><b>🎟️ 이벤트상세</b></td>
@@ -63,9 +63,19 @@
     <td align="center"><b>✏️ 후기작성</b></td>
   </tr>
   <tr>
-    <td><img src="이벤트상세.png" width="260"/></td>
-    <td><img src="여행후기목록.png" width="260"/></td>
-    <td><img src="후기작성.png" width="260"/></td>
+    <td><img src="이벤트상세.png" width="320"/></td>
+    <td><img src="여행후기목록.png" width="300"/></td>
+    <td><img src="후기작성.png" width="300"/></td>
+  </tr>
+    <tr>
+    <td align="center"><b>🎫 쿠폰오픈 목록</b></td>
+    <td align="center"><b>🎫 쿠폰오픈 상세1</b></td>
+    <td align="center"><b>🎫 쿠폰오픈 상세2</b></td>
+  </tr>
+  <tr>
+    <td><img width="1462" height="858" alt="image" src="https://github.com/user-attachments/assets/a1b89be9-b9c5-4900-875c-761d098ca879" /></td>
+    <td><img width="1547" height="861" alt="image" src="https://github.com/user-attachments/assets/57cfa299-2739-466b-9262-b3c96999f253" /></td>
+    <td><img width="1602" height="865" alt="image" src="https://github.com/user-attachments/assets/9680aec6-6bbf-485c-8fd8-80b2259d1578" /></td>
   </tr>
   <tr>
     <td align="center"><b>📄 후기상세</b></td>
@@ -73,9 +83,9 @@
     <td align="center"><b>🏢 회사소개</b></td>
   </tr>
   <tr>
-    <td><img src="후기상세.png" width="260"/></td>
-    <td><img src="마이페이지.png" width="260"/></td>
-    <td><img src="회사소개.png" width="260"/></td>
+    <td><img src="후기상세.png" width="300"/></td>
+    <td><img src="마이페이지.png" width="380"/></td>
+    <td><img src="회사소개.png" width="300"/></td>
   </tr>
   <tr>
     <td align="center"><b>🤝 파트너사</b></td>
