@@ -50,8 +50,8 @@ export const COUPON_EVENTS: CouponEvent[] = [
     description: "시티뷰 스위트 35% 할인",
     discountRate: 35,
     totalCount: 80,
-    openAt: "2026-02-27T03:00:00.000Z",
-    expireAt: "2026-03-05T03:00:00.000Z",
+    openAt: "2026-03-05T03:00:00.000Z",  // 🔒 잠금
+    expireAt: "2026-03-12T03:00:00.000Z",
     imageUrl: "/images/songdo.jpg",
   },
   {
@@ -60,8 +60,8 @@ export const COUPON_EVENTS: CouponEvent[] = [
     description: "오션뷰 객실 45% 할인",
     discountRate: 45,
     totalCount: 60,
-    openAt: "2026-02-25T03:00:00.000Z",
-    expireAt: "2026-03-01T03:00:00.000Z",
+    openAt: "2026-02-27T03:00:00.000Z",  // 🔒 잠금 (내일)
+    expireAt: "2026-03-05T03:00:00.000Z",
     imageUrl: "/images/gangneung.WEBP",
   },
   {
@@ -70,7 +70,7 @@ export const COUPON_EVENTS: CouponEvent[] = [
     description: "선셋 요트투어 50% 할인",
     discountRate: 50,
     totalCount: 40,
-    openAt: "2026-02-27T09:00:00.000Z",
+    openAt: "2026-02-27T09:00:00.000Z",  // ✅ 오늘 오픈 (그대로 or 미래로)
     expireAt: "2026-03-02T03:00:00.000Z",
     imageUrl: "/images/yeosu.webp",
   },
@@ -80,7 +80,7 @@ export const COUPON_EVENTS: CouponEvent[] = [
     description: "프리미엄 디너 뷔페 30% 할인",
     discountRate: 30,
     totalCount: 100,
-    openAt: "2026-02-28T03:00:00.000Z",
+    openAt: "2026-02-28T03:00:00.000Z",  // 🔒 이미 잠금 상태 (그대로 OK)
     expireAt: "2026-03-04T03:00:00.000Z",
     imageUrl: "/images/daegu.jpg",
   },
@@ -90,8 +90,8 @@ export const COUPON_EVENTS: CouponEvent[] = [
     description: "웨이크보드 & 수상스키 55% 할인",
     discountRate: 55,
     totalCount: 70,
-    openAt: "2026-02-24T03:00:00.000Z",
-    expireAt: "2026-02-28T03:00:00.000Z",
+    openAt: "2026-03-03T03:00:00.000Z",  // 🔒 잠금
+    expireAt: "2026-03-07T03:00:00.000Z",
     imageUrl: "/images/gapyeong.jpg",
   },
 ];

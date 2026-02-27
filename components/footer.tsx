@@ -53,7 +53,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          <p>{"(주) 트립딜 | 대표 : 홍길동 | 사업자등록번호 : 123-45-67890"}</p>
+          <p>{"(주) 트립딜 | 대표 : 정아름 | 사업자등록번호 : 123-45-67890"}</p>
           <p className="mt-1">{"서울특별시 강남구 테헤란로 123 트립딜빌딩 10층 | TEL : 02-1234-5678"}</p>
           <p className="mt-2">&copy; {new Date().getFullYear()} TripDeal. All rights reserved.</p>
         </div>
