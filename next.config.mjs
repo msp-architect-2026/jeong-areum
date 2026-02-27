@@ -1,18 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone', // export 대신 standalone으로 변경
   typescript: {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["images.unsplash.com"],
-  },
-  async rewrites() {
-    return [
+    unoptimized: true,
+    remotePatterns: [ // domains 대신 최신 권장 설정인 remotePatterns 사용
       {
-        source: "/api/:path*",
-        destination: "http://localhost:8080/:path*",
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
-    ];
+    ],
   },
 };
 
