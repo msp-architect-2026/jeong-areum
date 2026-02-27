@@ -1,0 +1,6 @@
+build/
+.gradle/
+.git/
+out/
+node_modules/
+*.log
