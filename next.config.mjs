@@ -1,17 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone', // export 대신 standalone으로 변경
+  output: 'standalone',
   typescript: {
     ignoreBuildErrors: true,
   },
   images: {
     unoptimized: true,
-    remotePatterns: [ // domains 대신 최신 권장 설정인 remotePatterns 사용
+    remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://backend:8080/api/:path*",
+      },
+    ];
   },
 };
 

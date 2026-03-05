@@ -12,7 +12,7 @@ export default function ReviewsPage() {
   const [reviews, setReviews] = useState([])
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews`)
+    fetch(`/api/reviews`)
       .then((res) => res.json())
       .then((data) => setReviews(data))
       .catch((err) => console.error("후기 목록 오류:", err))

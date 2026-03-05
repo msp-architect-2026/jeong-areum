@@ -35,7 +35,7 @@ export default function SignupPage() {
     formData.append("file", file)
 
     try {
-      const res = await fetch("http://localhost:8080/api/upload", {
+      const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       })
