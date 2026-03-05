@@ -1,0 +1,5 @@
+TripDeal Application has been deployed!
+
+Backend:  {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+Frontend: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+Redis:    {{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}
