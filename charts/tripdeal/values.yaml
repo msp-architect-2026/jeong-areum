@@ -1,7 +1,7 @@
 backend:
   image:
     repository: armddi/tripdeal-backend
-    tag: dev
+    tag: "dev"
   replicas: 2
   port: 8080
   resources:
@@ -15,7 +15,7 @@ backend:
 frontend:
   image:
     repository: armddi/tripdeal-frontend
-    tag: dev
+    tag: "dev"
   replicas: 2
   port: 3000
   resources:
