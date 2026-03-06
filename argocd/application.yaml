@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tripdeal
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/msp-architect-2026/jeong-areum.git
+    targetRevision: main
+    path: charts/tripdeal
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
