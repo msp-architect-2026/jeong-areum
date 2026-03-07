@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tripdeal-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tripdeal-mysql
+  template:
+    metadata:
+      labels:
+        app: tripdeal-mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "tripdeal1234"
+        - name: MYSQL_DATABASE
+          value: "tripdealdb"
+        - name: MYSQL_USER
+          value: "tripdeal"
+        - name: MYSQL_PASSWORD
+          value: "tripdeal1234"
+        ports:
+        - containerPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tripdeal-mysql
+spec:
+  selector:
+    app: tripdeal-mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
