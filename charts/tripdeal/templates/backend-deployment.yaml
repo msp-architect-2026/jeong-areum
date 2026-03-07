@@ -28,5 +28,11 @@ spec:
           env:
             - name: SPRING_REDIS_HOST
               value: tripdeal-redis
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:h2:file:/data/tripdealdb
+            - name: DB_URL
+              value: "jdbc:mysql://tripdeal-mysql:3306/tripdealdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+            - name: DB_USERNAME
+              value: "tripdeal"
+            - name: DB_PASSWORD
+              value: "tripdeal1234"
+            - name: DDL_AUTO
+              value: "update"
