@@ -36,3 +36,5 @@ spec:
               value: "tripdeal1234"
             - name: DDL_AUTO
               value: "update"
+            - name: DB_DRIVER
+              value: "com.mysql.cj.jdbc.Driver"
