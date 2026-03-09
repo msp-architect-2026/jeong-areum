@@ -31,7 +31,6 @@ interface AuthContextType {
   downloadedDeals: string[]
   downloadDeal: (dealId: string) => void
 
-  // ✅ 쿠폰 이벤트
   downloadedCoupons: number[]
   downloadCoupon: (couponEventId: number) => void
 
@@ -67,14 +66,12 @@ const loadUserFromStorage = (): User | null => {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  // ✅ 초기값 [] 고정 → useEffect에서 localStorage 로드 (hydration 안전)
   const [downloadedDeals, setDownloadedDeals] = useState<string[]>([])
   const [downloadedCoupons, setDownloadedCoupons] = useState<number[]>([])
   const [likedReviews, setLikedReviews] = useState<string[]>([])
   const [savedReviews, setSavedReviews] = useState<string[]>([])
   const [myReviews, setMyReviews] = useState<string[]>([])
 
-  // ✅ 클라이언트 마운트 후에만 localStorage 읽기
   useEffect(() => {
     const savedUser = loadUserFromStorage()
     if (savedUser) setUser(savedUser)
@@ -102,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+      const response = await fetch(`/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -131,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profileImageUrl?: string
   ): Promise<boolean> => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
+      const response = await fetch(`/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, nickname, email, password, profileImageUrl }),
@@ -148,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return false
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${encodeURIComponent(user.email)}/profile-image`,
+        `/api/users/${encodeURIComponent(user.email)}/profile-image`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -174,7 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!trimmed) return { ok: false, message: "닉네임을 입력해주세요." }
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${encodeURIComponent(user.email)}/nickname`,
+        `/api/users/${encodeURIComponent(user.email)}/nickname`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
