@@ -17,7 +17,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://backend:8080/api/:path*",
+        destination: "http://tripdeal-backend:8080/api/:path*",
       },
     ];
   },
