@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/coupons")
-@CrossOrigin(origins = "*")
+
 public class CouponController {
 
     private final CouponRepository couponRepository;
