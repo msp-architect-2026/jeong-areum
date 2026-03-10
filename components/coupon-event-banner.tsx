@@ -62,7 +62,7 @@ export const COUPON_EVENTS: CouponEvent[] = [
     totalCount: 60,
     openAt: "2026-02-27T03:00:00.000Z",  // 🔒 잠금 (내일)
     expireAt: "2026-03-05T03:00:00.000Z",
-    imageUrl: "/images/gangneung.WEBP",
+    imageUrl: "/images/gangneung.webp",
   },
   {
     id: 3,
