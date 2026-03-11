@@ -10,7 +10,7 @@ services:
       MYSQL_USER: tripdeal
       MYSQL_PASSWORD: tripdeal1234
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
