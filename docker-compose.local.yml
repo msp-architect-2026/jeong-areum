@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tripdeal-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: tripdeal1234
+      MYSQL_DATABASE: tripdealdb
+      MYSQL_USER: tripdeal
+      MYSQL_PASSWORD: tripdeal1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - tripdeal-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "tripdeal", "-ptripdeal1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    container_name: tripdeal-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - tripdeal-net
+
+  backend:
+    image: armddi/tripdeal-backend:v12
+    container_name: tripdeal-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APP_NAME: tripdeal
+      DB_URL: jdbc:mysql://mysql:3306/tripdealdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_DRIVER: com.mysql.cj.jdbc.Driver
+      DB_USERNAME: tripdeal
+      DB_PASSWORD: tripdeal1234
+      DDL_AUTO: update
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - tripdeal-net
+    restart: on-failure
+
+  frontend:
+    image: armddi/tripdeal-frontend:v15
+    container_name: tripdeal-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - tripdeal-net
+
+volumes:
+  mysql-data:
+
+networks:
+  tripdeal-net:
