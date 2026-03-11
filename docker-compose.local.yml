@@ -56,7 +56,7 @@ services:
     image: armddi/tripdeal-frontend:v15
     container_name: tripdeal-frontend
     ports:
-      - "3000:80"
+      - "3001:80"
     depends_on:
       - backend
     networks:
