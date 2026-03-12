@@ -1,8 +1,23 @@
-# ✈️ TripDeal
+<div align="center">
 
-안정적인 여행 커뮤니티 및 타임세일 이벤트를 위한 고가용성 인프라 구축 프로젝트
+<img src="https://capsule-render.vercel.app/api?type=waving&color=2E86C1&height=200&section=header&text=✈️%20TripDeal&fontSize=60&fontColor=ffffff&fontAlign=50&fontAlignY=55&desc=High%20Availability%20%26%20Stability%20at%20Scale&descSize=18&descColor=ffffff&descAlignY=75" />
 
-단순한 기능 구현을 넘어, 특정 시즌(성수기)과 선착순 이벤트 시 발생하는 트래픽 폭증, 그리고 예상치 못한 서버 장애 상황에서도 서비스가 안정적으로 유지될 수 있도록 인프라를 설계, 구현 및 검증하는 프로젝트입니다.
+![](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![](https://img.shields.io/badge/Redis-FF4438?style=for-the-badge&logo=redis&logoColor=white)
+![](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![](https://img.shields.io/badge/ArgoCD-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)
+
+<br>
+
+> 🌏 *안정적인 여행 커뮤니티 및 타임세일 이벤트를 위한 고가용성 인프라 구축 프로젝트*
+
+</div>
+
+---
+
+단순한 기능 구현을 넘어, 특정 시즌(성수기)과 선착순 이벤트 시 발생하는 **트래픽 폭증**, 그리고 예상치 못한 **서버 장애 상황**에서도 서비스가 안정적으로 유지될 수 있도록 인프라를 설계, 구현 및 검증하는 프로젝트입니다.
 
 ---
 
