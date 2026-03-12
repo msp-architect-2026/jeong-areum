@@ -1,6 +1,8 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=2E86C1&height=200&section=header&text=✈️%20TripDeal&fontSize=60&fontColor=ffffff&fontAlign=50&fontAlignY=55&desc=High%20Availability%20%26%20Stability%20at%20Scale&descSize=18&descColor=ffffff&descAlignY=75" />
+# ✈️ TripDeal
+
+### High Availability & Stability at Scale
 
 ![](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
 ![](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
